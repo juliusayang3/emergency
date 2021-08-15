@@ -1,5 +1,6 @@
 import 'package:emergency/model/phone.dart';
 import 'package:emergency/utils/user_preferences.dart';
+import 'package:emergency/widgets/textfield_widget.dart';
 import 'package:flutter/material.dart';
 
 class PhoneNUmberPopUp extends StatefulWidget {
@@ -48,33 +49,13 @@ class _PhoneNUmberPopUpState extends State<PhoneNUmberPopUp> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(8),
-                  child: TextFormField(
-                      initialValue: phone.phoneNumber,
-                      cursorColor: Colors.grey[700],
-                      keyboardType: TextInputType.phone,
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Phone number',
-                        hintStyle: TextStyle(
-                          color: Colors.grey[600],
-                        ),
-                        enabledBorder: OutlineInputBorder(),
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (phoneNumber) => phone = phone.copy(
-                            phoneNumber: phoneNumber,
-                          ),
-                      validator: (phoneNumber) {
-                        if (phoneNumber.isEmpty ||
-                            !RegExp(r'^[+]*[s\./0-9]+$')
-                                .hasMatch(phoneNumber)) {
-                          return error;
-                        } else {
-                          return null;
-                        }
-                      }),
+                  child: TextFieldWidget(
+                    label: 'Phone Number',
+                    text: phone.phoneNumber,
+                    onChanged: (phoneNumber) => phone = phone.copy(
+                      phoneNumber: phoneNumber,
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8),

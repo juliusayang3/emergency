@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    
+
     return Builder(
       builder: (context) => Scaffold(
         appBar: AppBar(
@@ -256,13 +256,17 @@ class _HomePageState extends State<HomePage> {
                     child: PhysicalModel(
                       color: Colors.black,
                       shape: BoxShape.circle,
-                      elevation: 50,
+                      elevation: 10,
                       child: Container(
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.red,
+                          border: Border.all(
+                            width: 10,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ),
                     ),
