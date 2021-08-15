@@ -34,3 +34,31 @@ class Telephone {
     );
   }
 }
+
+TextFormField(
+                      initialValue: phone.phoneNumber,
+                      cursorColor: Colors.grey[700],
+                      keyboardType: TextInputType.phone,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Phone number',
+                        hintStyle: TextStyle(
+                          color: Colors.grey[600],
+                        ),
+                        enabledBorder: OutlineInputBorder(),
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (phoneNumber) => phone = phone.copy(
+                            phoneNumber: phoneNumber,
+                          ),
+                      validator: (phoneNumber) {
+                        if (phoneNumber.isEmpty ||
+                            !RegExp(r'^[+]*[s\./0-9]+$')
+                                .hasMatch(phoneNumber)) {
+                          return error;
+                        } else {
+                          return null;
+                        }
+                      }),
