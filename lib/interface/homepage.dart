@@ -11,19 +11,16 @@ import 'package:telephony/telephony.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
-  
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  String _message = "This is the message from the emergency app";
   final Telephony telephony = Telephony.instance;
 
   String error = 'Enter correct Phone Number';
 
-  String currentAddress = "My address";
+  String currentAddress;
   Position currentPosition;
 
   final phone = UserSimplePreferences.getPhone();
@@ -34,14 +31,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // _determinePosition();
+    _determinePosition();
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-
+    
     return Builder(
       builder: (context) => Scaffold(
         appBar: AppBar(
@@ -116,19 +113,23 @@ class _HomePageState extends State<HomePage> {
                         currentPosition != null
                             ? Text(
                                 'LAT: ' +
-                                    currentPosition.latitude.toString() +
+                                    currentPosition.latitude
+                                        .toStringAsPrecision(5) +
                                     '  LONG: ' +
-                                    currentPosition.longitude.toString() +
+                                    currentPosition.longitude
+                                        .toStringAsPrecision(5) +
                                     '  ACC: ' +
-                                    currentPosition.accuracy.toString(),
+                                    currentPosition.accuracy
+                                        .toStringAsPrecision(5),
                                 style: TextStyle(
                                   fontSize: 16,
                                 ),
                               )
                             : Text(
-                                'Please wait while your location',
+                                'Loading co-ordinates ....',
                                 style: TextStyle(
                                   fontSize: 16,
+                                  color: Colors.grey[700],
                                 ),
                               ),
                       ],
@@ -152,21 +153,29 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
+                      horizontal: 10,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Icon(
-                          Icons.flag,
+                          Icons.location_on,
                           size: 30,
                         ),
-                        Text(
-                          currentAddress,
-                          style: TextStyle(
-                            fontSize: 17,
-                          ),
-                        ),
+                        currentAddress != null
+                            ? Text(
+                                currentAddress,
+                                style: TextStyle(
+                                  fontSize: 17,
+                                ),
+                              )
+                            : Text(
+                                'Loading current address ....',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
                       ],
                     ),
                   ),
@@ -223,6 +232,7 @@ class _HomePageState extends State<HomePage> {
                                   'Input Emergency Phone number',
                                   style: TextStyle(
                                     fontSize: 17,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
                         ],
@@ -234,7 +244,12 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    _sendMessage();
+                    _sendMessage(
+                      'This is an EMERGENCY ALERT!!\nCurrent Location: https://www.google.com/maps/search/?api=1&query=' +
+                          currentPosition.latitude.toString() +
+                          ',' +
+                          currentPosition.longitude.toString(),
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(50.0),
@@ -254,14 +269,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: () {
-                  setState(() {});
-                },
-                child: Text(
-                  'tap me',
-                ),
-              ),
             ],
           ),
         ),
@@ -269,7 +276,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _sendMessage() async {
+  _sendMessage(String message) async {
     var status = await Permission.sms.status;
     // check permission status
     if (status.isDenied) {
@@ -291,7 +298,7 @@ class _HomePageState extends State<HomePage> {
 
     telephony.sendSms(
       to: phone.phoneNumber,
-      message: _message,
+      message: message,
     );
   }
 

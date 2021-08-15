@@ -26,8 +26,8 @@ class UserSimplePreferences {
   
   static const _keyUser = 'user';
   static const myUser = User(
-    firstName: 'julius',
-    lastName: 'ayang',
+    firstName: '',
+    lastName: '',
   );
 
   static Future setUser(User user) async {
@@ -47,7 +47,7 @@ class UserSimplePreferences {
 
   static const _keyPhone = 'phone';
   static const myPhone = Phone(
-    phoneNumber: '09027520630',
+    phoneNumber: null,
     
   );
 
