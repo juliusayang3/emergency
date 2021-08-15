@@ -1,3 +1,3 @@
 # emergency
 
-An emergency all built with Flutter.
+An emergency app built with Flutter.
