@@ -49,26 +49,6 @@ class _DrawerNameState extends State<DrawerName> {
             SizedBox(
               height: 30,
             ),
-            InkResponse(
-              onTap: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Profile(),
-                  ),
-                );
-                setState(() {});
-              },
-              child: Container(
-                child: Text(
-                  'Edit Profile',
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
             SizedBox(
               height: 70,
             ),

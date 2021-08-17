@@ -1,7 +1,7 @@
 class Phone {
-  final String phoneNumber;
+  String phoneNumber;
 
-  const Phone({
+  Phone({
     this.phoneNumber,
   });
 

@@ -46,7 +46,7 @@ class UserSimplePreferences {
   }
 
   static const _keyPhone = 'phone';
-  static const myPhone = Phone(
+  static Phone myPhone = Phone(
     phoneNumber: null,
     
   );

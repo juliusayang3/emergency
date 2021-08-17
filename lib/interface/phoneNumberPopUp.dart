@@ -52,8 +52,8 @@ class _PhoneNUmberPopUpState extends State<PhoneNUmberPopUp> {
                   child: TextFieldWidget(
                     label: 'Phone Number',
                     text: phone.phoneNumber,
-                    onChanged: (phoneNumber) => phone = phone.copy(
-                      phoneNumber: phoneNumber,
+                    onChanged: (phoneNumber) => setState(
+                      () => this.phone.phoneNumber = phone.phoneNumber,
                     ),
                   ),
                 ),

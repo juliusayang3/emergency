@@ -3,6 +3,7 @@ import 'package:emergency/interface/phoneNumberPopUp.dart';
 import 'package:emergency/interface/profile.dart';
 import 'package:emergency/model/phone.dart';
 import 'package:emergency/utils/user_preferences.dart';
+import 'package:emergency/widgets/textfield_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
@@ -11,26 +12,29 @@ import 'package:telephony/telephony.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({
+    Key key,
+  }): super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  final _formKey = GlobalKey<FormState>();
   final Telephony telephony = Telephony.instance;
 
   String error = 'Enter correct Phone Number';
-
+  String phoneNumber;
   String currentAddress;
   Position currentPosition;
-
-  final phone = UserSimplePreferences.getPhone();
 
   final user = UserSimplePreferences.getUser();
 
   @override
   void initState() {
     super.initState();
-
+    phoneNumber = UserSimplePreferences.getPhoneNumber();
     _determinePosition();
   }
 
@@ -190,7 +194,114 @@ class _HomePageState extends State<HomePage> {
                     await showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return PhoneNUmberPopUp();
+                        return AlertDialog(
+                          backgroundColor: Colors.grey[500],
+                          content: Stack(
+                            children: [
+                              Positioned(
+                                child: InkResponse(
+                                  radius: 30,
+                                  onTap: () => Navigator.of(context).pop(),
+                                  child: CircleAvatar(
+                                    child: Icon(
+                                      Icons.close,
+                                      color: Colors.grey[700],
+                                    ),
+                                    backgroundColor: Colors.grey[500],
+                                  ),
+                                ),
+                              ),
+                              Form(
+                                key: _formKey,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      height: 60,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8),
+                                      child: TextFieldWidget(
+                                        label: 'Phone Number',
+                                        text: phoneNumber,
+                                        onChanged: (phoneNumber) => setState(
+                                          () => this.phoneNumber = phoneNumber,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8),
+                                      child: InkResponse(
+                                        radius: 30,
+                                        onTap: () {
+                                          if (_formKey.currentState
+                                              .validate()) {
+                                            _formKey.currentState.save();
+                                            UserSimplePreferences
+                                                .setPhoneNumber(phoneNumber);
+                                          }
+                                          final snackBar = SnackBar(
+                                            backgroundColor: Colors.grey[500],
+                                            content: Container(
+                                              height: 30,
+                                              width: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[600],
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'Number Saved!',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.grey[800],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            shape: StadiumBorder(),
+                                            behavior: SnackBarBehavior.floating,
+                                            margin: EdgeInsets.symmetric(
+                                              horizontal: 100,
+                                              vertical: 20,
+                                            ),
+                                            duration: Duration(
+                                              seconds: 2,
+                                            ),
+                                            elevation: 0,
+                                          );
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(snackBar);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Container(
+                                          height: 30,
+                                          width: 60,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[700],
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'Save',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.grey[300],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
                       },
                     );
                     setState(() {});
@@ -213,7 +324,7 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Icon(
-                            phone.phoneNumber != null
+                            phoneNumber != null
                                 ? Icons.person
                                 : Icons.person_add,
                             size: 30,
@@ -221,9 +332,9 @@ class _HomePageState extends State<HomePage> {
                           SizedBox(
                             width: 30,
                           ),
-                          phone.phoneNumber != null
+                          phoneNumber != null
                               ? Text(
-                                  phone.phoneNumber,
+                                  phoneNumber,
                                   style: TextStyle(
                                     fontSize: 17,
                                   ),
@@ -290,7 +401,7 @@ class _HomePageState extends State<HomePage> {
       print('permission granted');
     }
 
-    print(phone.phoneNumber);
+    print(phoneNumber);
 
     // check if a device is capable of sending SMS
     bool canSendSms = await telephony.isSmsCapable;
@@ -301,7 +412,7 @@ class _HomePageState extends State<HomePage> {
     print(simState);
 
     telephony.sendSms(
-      to: phone.phoneNumber,
+      to: phoneNumber,
       message: message,
     );
   }
