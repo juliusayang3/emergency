@@ -1,9 +1,11 @@
 import 'package:emergency/model/user.dart';
 import 'package:emergency/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key key}) : super(key: key);
+  static const String id = 'profile';
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -16,13 +18,15 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
 
-    user = UserSimplePreferences.getUser();
+    
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+    final providerUserPref = Provider.of<UserSimplePreferences>(context);
+    user = providerUserPref.getUser();
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -116,7 +120,7 @@ class _ProfileState extends State<Profile> {
               child: InkResponse(
                 radius: 30,
                 onTap: () {
-                  UserSimplePreferences.setUser(user);
+                  providerUserPref.setUser(user);
                   Navigator.pop(context);
                 },
                 child: Container(

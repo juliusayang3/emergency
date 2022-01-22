@@ -1,69 +1,64 @@
 import 'dart:convert';
 
 import 'package:emergency/model/phone.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emergency/model/user.dart';
 
-class UserSimplePreferences {
+class UserSimplePreferences extends ChangeNotifier {
   static SharedPreferences _preferences;
-
+  String offlineNumber;
   static const _keyPhoneNumber = 'phoneNumber';
-  
 
   static Future init() async {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  static Future setPhoneNumber(String phoneNumber) async {
-    await _preferences.setString(
-      _keyPhoneNumber,
-      phoneNumber,
-    );
+  Future setPhoneNumber(String phoneNumber) async {
+    try {
+      await _preferences.setString(
+        _keyPhoneNumber,
+        phoneNumber,
+      );
+    } catch (e) {
+      print(e);
+    }
+
+    notifyListeners();
   }
 
-  static String getPhoneNumber() => _preferences.getString(_keyPhoneNumber);
+  String get number {
+    return offlineNumber;
+  }
 
-  
+  numberOffline(String number) {
+    offlineNumber = number;
+    notifyListeners();
+  }
+
+  String get getPhoneNumber {
+    return _preferences.getString(_keyPhoneNumber);
+  }
+
   static const _keyUser = 'user';
   static const myUser = User(
     firstName: '',
     lastName: '',
   );
 
-  static Future setUser(User user) async {
+  Future setUser(User user) async {
     final json = jsonEncode(user.toJson());
 
     await _preferences.setString(
       _keyUser,
       json,
     );
+    notifyListeners();
   }
 
-  static User getUser() {
+  User getUser() {
     final json = _preferences.getString(_keyUser);
-
     return json == null ? myUser : User.fromJson(jsonDecode(json));
-  }
-
-  static const _keyPhone = 'phone';
-  static Phone myPhone = Phone(
-    phoneNumber: null,
-    
-  );
-
-  static Future setPhone(Phone phone) async {
-    final json = jsonEncode(phone.toJson());
-
-    await _preferences.setString(
-      _keyPhone,
-      json,
-    );
-  }
-
-  static Phone getPhone() {
-    final json = _preferences.getString(_keyPhone);
-
-    return json == null ? myPhone : Phone.fromJson(jsonDecode(json));
-
   }
 }

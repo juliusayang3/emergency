@@ -2,6 +2,7 @@ import 'package:emergency/interface/profile.dart';
 import 'package:emergency/model/user.dart';
 import 'package:emergency/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DrawerName extends StatefulWidget {
   const DrawerName({Key key}) : super(key: key);
@@ -11,8 +12,6 @@ class DrawerName extends StatefulWidget {
 }
 
 class _DrawerNameState extends State<DrawerName> {
-  final user = UserSimplePreferences.getUser();
-
   @override
   void initState() {
     super.initState();
@@ -22,7 +21,8 @@ class _DrawerNameState extends State<DrawerName> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-
+    final providerUserPref =
+        Provider.of<UserSimplePreferences>(context).getUser();
     return Drawer(
       child: Container(
         color: Colors.grey[400],
@@ -49,6 +49,30 @@ class _DrawerNameState extends State<DrawerName> {
             SizedBox(
               height: 30,
             ),
+            Container(
+              height: 40,
+              width: width / 2.5,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey[300],
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: TextButton(
+                  onPressed: () => Navigator.pushNamed(context, Profile.id),
+                  child: Text(
+                    'Edit',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             SizedBox(
               height: 70,
             ),
@@ -67,7 +91,7 @@ class _DrawerNameState extends State<DrawerName> {
                   ),
                   child: Center(
                     child: Text(
-                      user.firstName,
+                      providerUserPref.firstName,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -89,7 +113,7 @@ class _DrawerNameState extends State<DrawerName> {
                   ),
                   child: Center(
                     child: Text(
-                      user.lastName,
+                      providerUserPref.lastName,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,

@@ -1,20 +1,26 @@
+import 'package:emergency/interface/confirm_number.dart';
 import 'package:emergency/interface/drawer.dart';
-import 'package:emergency/interface/phoneNumberPopUp.dart';
+import 'package:emergency/interface/add_phonenumber_contact.dart';
 import 'package:emergency/interface/profile.dart';
 import 'package:emergency/model/phone.dart';
+import 'package:emergency/utils/contacts.dart';
+import 'package:emergency/utils/location.dart';
+import 'package:emergency/utils/message.dart';
 import 'package:emergency/utils/user_preferences.dart';
-import 'package:emergency/widgets/textfield_widget.dart';
+import 'package:emergency/widgets/custom_alert_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:telephony/telephony.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
     Key key,
-  }): super(key: key);
+  }) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -22,27 +28,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
-  final Telephony telephony = Telephony.instance;
+  //final Telephony telephony = Telephony.instance;
 
   String error = 'Enter correct Phone Number';
-  String phoneNumber;
-  String currentAddress;
-  Position currentPosition;
-
-  final user = UserSimplePreferences.getUser();
 
   @override
   void initState() {
     super.initState();
-    phoneNumber = UserSimplePreferences.getPhoneNumber();
-    _determinePosition();
+    Provider.of<GetLocation>(context, listen: false).determinePosition();
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-
+    final providerUserPref = Provider.of<UserSimplePreferences>(context);
+    final providerLocation = Provider.of<GetLocation>(context);
+    print(Provider.of<GetLocation>(context).currentPosition.toString());
     return Builder(
       builder: (context) => Scaffold(
         appBar: AppBar(
@@ -63,7 +65,6 @@ class _HomePageState extends State<HomePage> {
                     builder: (context) => Profile(),
                   ),
                 );
-                setState(() {});
               },
               child: Container(
                 padding: EdgeInsets.only(
@@ -114,17 +115,14 @@ class _HomePageState extends State<HomePage> {
                           Icons.location_on,
                           size: 30,
                         ),
-                        currentPosition != null
+                        providerLocation.currentPosition != null
                             ? Text(
                                 'LAT: ' +
-                                    currentPosition.latitude
-                                        .toStringAsPrecision(5) +
+                                    providerLocation.currentPositionLatitude +
                                     '  LONG: ' +
-                                    currentPosition.longitude
-                                        .toStringAsPrecision(5) +
+                                    providerLocation.currentPositionLongitude +
                                     '  ACC: ' +
-                                    currentPosition.accuracy
-                                        .toStringAsPrecision(5),
+                                    providerLocation.currentPositionAccuracy,
                                 style: TextStyle(
                                   fontSize: 16,
                                 ),
@@ -166,9 +164,9 @@ class _HomePageState extends State<HomePage> {
                           Icons.location_on,
                           size: 30,
                         ),
-                        currentAddress != null
+                        providerLocation.currentAddress != null
                             ? Text(
-                                currentAddress,
+                                providerLocation.currentAddress,
                                 style: TextStyle(
                                   fontSize: 17,
                                 ),
@@ -191,120 +189,19 @@ class _HomePageState extends State<HomePage> {
                 ),
                 child: InkResponse(
                   onTap: () async {
-                    await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.grey[500],
-                          content: Stack(
-                            children: [
-                              Positioned(
-                                child: InkResponse(
-                                  radius: 30,
-                                  onTap: () => Navigator.of(context).pop(),
-                                  child: CircleAvatar(
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Colors.grey[700],
-                                    ),
-                                    backgroundColor: Colors.grey[500],
-                                  ),
-                                ),
-                              ),
-                              Form(
-                                key: _formKey,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      height: 60,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: TextFieldWidget(
-                                        label: 'Phone Number',
-                                        text: phoneNumber,
-                                        onChanged: (phoneNumber) => setState(
-                                          () => this.phoneNumber = phoneNumber,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: InkResponse(
-                                        radius: 30,
-                                        onTap: () {
-                                          if (_formKey.currentState
-                                              .validate()) {
-                                            _formKey.currentState.save();
-                                            UserSimplePreferences
-                                                .setPhoneNumber(phoneNumber);
-                                          }
-                                          final snackBar = SnackBar(
-                                            backgroundColor: Colors.grey[500],
-                                            content: Container(
-                                              height: 30,
-                                              width: 50,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey[600],
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  'Number Saved!',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: Colors.grey[800],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            shape: StadiumBorder(),
-                                            behavior: SnackBarBehavior.floating,
-                                            margin: EdgeInsets.symmetric(
-                                              horizontal: 100,
-                                              vertical: 20,
-                                            ),
-                                            duration: Duration(
-                                              seconds: 2,
-                                            ),
-                                            elevation: 0,
-                                          );
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(snackBar);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          width: 60,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[700],
-                                            borderRadius:
-                                                BorderRadius.circular(3),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              'Save',
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.grey[300],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                    setState(() {});
+                    final PermissionStatus permissionStatus =
+                        await ContactUtil.getPermission();
+                    if (permissionStatus == PermissionStatus.granted) {
+                      Navigator.pushNamed(context, ConfirmNumber.id);
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) => CustomAlertDialog(
+                          title: 'Permission Error',
+                          content: 'Please enable contacts access',
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     height: height * 0.06,
@@ -324,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Icon(
-                            phoneNumber != null
+                            providerUserPref.getPhoneNumber != null
                                 ? Icons.person
                                 : Icons.person_add,
                             size: 30,
@@ -332,20 +229,10 @@ class _HomePageState extends State<HomePage> {
                           SizedBox(
                             width: 30,
                           ),
-                          phoneNumber != null
-                              ? Text(
-                                  phoneNumber,
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                  ),
-                                )
-                              : Text(
-                                  'Input Emergency Phone number',
-                                  style: TextStyle(
-                                    fontSize: 17,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
+                          Text(
+                            providerUserPref.getPhoneNumber ??
+                                'Input Emergency Number',
+                          ),
                         ],
                       ),
                     ),
@@ -355,11 +242,12 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    _sendMessage(
+                    MessageUtil.sendMessage(
                       'This is an EMERGENCY ALERT!!\nCurrent Location: https://www.google.com/maps/search/?api=1&query=' +
-                          currentPosition.latitude.toString() +
+                          providerLocation.currentPositionLatitude +
                           ',' +
-                          currentPosition.longitude.toString(),
+                          providerLocation.currentPositionLongitude,
+                      providerUserPref.getPhoneNumber,
                     );
                   },
                   child: Padding(
@@ -391,68 +279,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _sendMessage(String message) async {
-    var status = await Permission.sms.status;
-    // check permission status
-    if (status.isDenied) {
-      print('permission denied');
-    }
-    if (status.isGranted) {
-      print('permission granted');
-    }
-
-    print(phoneNumber);
-
-    // check if a device is capable of sending SMS
-    bool canSendSms = await telephony.isSmsCapable;
-    print(canSendSms);
-
-    // get sim state
-    SimState simState = await telephony.simState;
-    print(simState);
-
-    telephony.sendSms(
-      to: phoneNumber,
-      message: message,
-    );
-  }
-
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      Fluttertoast.showToast(msg: 'Please keep your location on');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-
-      if (permission == LocationPermission.denied) {
-        Fluttertoast.showToast(msg: 'Location permission is denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      Fluttertoast.showToast(msg: 'Permission is denied forever');
-    }
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    try {
-      List<Placemark> placemark = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      Placemark place = placemark[0];
-      setState(() {
-        currentPosition = position;
-        currentAddress =
-            " ${place.street}, ${place.postalCode}, ${place.locality}, ${place.country}";
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
+  
+  
 }
