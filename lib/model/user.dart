@@ -1,6 +1,6 @@
 class User {
-  final String firstName;
-  final String lastName;
+  final String? firstName;
+  final String? lastName;
 
   const User({
     this.firstName,
@@ -8,8 +8,8 @@ class User {
   });
 
   User copy({
-    String firstName,
-    String lastName,
+    String? firstName,
+    String? lastName,
   }) =>
       User(
         firstName: firstName ?? this.firstName,
@@ -17,13 +17,12 @@ class User {
       );
 
   static User fromJson(Map<String, dynamic> json) => User(
-    firstName: json['firstName'],
-    lastName: json['lastName'],
-  );
+        firstName: json['firstName'],
+        lastName: json['lastName'],
+      );
 
   Map<String, dynamic> toJson() => {
         'firstName': firstName,
         'lastName': lastName,
       };
 }
-

@@ -1,8 +1,8 @@
-import 'package:emergency/model/phone.dart';
 import 'package:emergency/utils/helper_functions.dart';
 import 'package:emergency/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:logger/web.dart';
 import 'package:provider/provider.dart';
 
 class AddPhoneNumber extends StatefulWidget {
@@ -36,17 +36,18 @@ class _AddPhoneNumberState extends State<AddPhoneNumber> {
   @override
   void initState() {
     super.initState();
-    getAllContacts();
+    Future.delayed(Duration.zero, getAllContacts);
   }
 
   @override
   Widget build(BuildContext context) {
     final providerUserPref = Provider.of<UserSimplePreferences>(context);
     return Scaffold(
-      backgroundColor: Colors.grey[500],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'Select Contact',
+          style: TextStyle(color: Colors.white),
         ),
       ),
       body: loading
@@ -58,50 +59,39 @@ class _AddPhoneNumberState extends State<AddPhoneNumber> {
                 Expanded(
                   child: ListView.builder(
                     shrinkWrap: true,
-                    itemCount: contacts?.length ?? 0,
+                    itemCount: contacts.length,
                     itemBuilder: (context, index) {
-                      Contact contact = contacts?.elementAt(index);
+                      Contact contact = contacts.elementAt(index);
                       return Column(
                         children: [
                           ListTile(
                             leading: (contact.avatar != null &&
-                                    contact.avatar.isNotEmpty)
+                                    contact.avatar!.isNotEmpty)
                                 ? CircleAvatar(
                                     backgroundImage:
-                                        MemoryImage(contact.avatar),
+                                        MemoryImage(contact.avatar!),
                                   )
                                 : CircleAvatar(
-                                    backgroundColor: Colors.grey[800],
+                                    backgroundColor: Colors.white,
                                     child: Text(contact.initials()),
                                   ),
                             title: Text(contact.displayName ?? 'No name'),
                             subtitle: Text(HelperFunctions.getValidPhoneNumber(
-                                    contact.phones) ??
+                                    contact.phones!) ??
                                 ''),
                             onTap: () {
-                              String number =
+                              String? number =
                                   HelperFunctions.getEmergencyPhoneNumber(
                                 HelperFunctions.getValidPhoneNumber(
-                                    contact.phones),
+                                    contact.phones!),
                               );
-
-                              if (providerUserPref.setPhoneNumber(number) ==
-                                  null) {
-                                final snackBar = SnackBar(
-                                  content: Text('No existing Phone Number'),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                              } else {
-                                
-                                providerUserPref.numberOffline(number);
-                                final snackBar = SnackBar(
-                                  content: Text('Phone Number added'),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                                Navigator.of(context).pop();
-                              }
+                              providerUserPref.setPhoneNumber(number ?? '');
+                              final snackBar = SnackBar(
+                                content: Text('Phone Number added'),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                              Navigator.of(context).pop();
                             },
                           ),
                           Divider(),

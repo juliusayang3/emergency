@@ -1,7 +1,7 @@
-import 'package:emergency/interface/add_phonenumber_contact.dart';
-import 'package:emergency/interface/confirm_number.dart';
-import 'package:emergency/interface/homepage.dart';
-import 'package:emergency/interface/profile.dart';
+import 'package:emergency/pages/add_phonenumber_contact.dart';
+import 'package:emergency/pages/confirm_number.dart';
+import 'package:emergency/pages/home_page.dart';
+import 'package:emergency/pages/profile.dart';
 import 'package:emergency/utils/location.dart';
 import 'package:emergency/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ void main() async {
 }
 
 class Root extends StatelessWidget {
-  const Root({Key key}) : super(key: key);
+  const Root({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +32,9 @@ class Root extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: Colors.grey[700],
-          scaffoldBackgroundColor: Colors.grey[500],
-          appBarTheme: AppBarTheme(
-            centerTitle: true,
-            color: Colors.grey[600],
-          ),
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme:
+              AppBarTheme(centerTitle: true, color: Colors.purple[800]),
           buttonTheme: ButtonThemeData(
             buttonColor: Colors.grey[700],
           ),

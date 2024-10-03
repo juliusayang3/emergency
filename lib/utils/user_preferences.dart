@@ -1,14 +1,11 @@
 import 'dart:convert';
-
-import 'package:emergency/model/phone.dart';
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emergency/model/user.dart';
 
 class UserSimplePreferences extends ChangeNotifier {
-  static SharedPreferences _preferences;
-  String offlineNumber;
+  static SharedPreferences? _preferences;
+  String? offlineNumber;
   static const _keyPhoneNumber = 'phoneNumber';
 
   static Future init() async {
@@ -17,7 +14,7 @@ class UserSimplePreferences extends ChangeNotifier {
 
   Future setPhoneNumber(String phoneNumber) async {
     try {
-      await _preferences.setString(
+      await _preferences?.setString(
         _keyPhoneNumber,
         phoneNumber,
       );
@@ -28,7 +25,7 @@ class UserSimplePreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get number {
+  String? get number {
     return offlineNumber;
   }
 
@@ -37,8 +34,8 @@ class UserSimplePreferences extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get getPhoneNumber {
-    return _preferences.getString(_keyPhoneNumber);
+  String? get getPhoneNumber {
+    return _preferences?.getString(_keyPhoneNumber);
   }
 
   static const _keyUser = 'user';
@@ -50,7 +47,7 @@ class UserSimplePreferences extends ChangeNotifier {
   Future setUser(User user) async {
     final json = jsonEncode(user.toJson());
 
-    await _preferences.setString(
+    await _preferences?.setString(
       _keyUser,
       json,
     );
@@ -58,7 +55,7 @@ class UserSimplePreferences extends ChangeNotifier {
   }
 
   User getUser() {
-    final json = _preferences.getString(_keyUser);
+    final json = _preferences?.getString(_keyUser);
     return json == null ? myUser : User.fromJson(jsonDecode(json));
   }
 }

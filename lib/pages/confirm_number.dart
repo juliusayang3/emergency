@@ -1,32 +1,49 @@
-import 'package:emergency/interface/add_phonenumber_contact.dart';
+import 'package:emergency/pages/add_phonenumber_contact.dart';
 import 'package:emergency/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class ConfirmNumber extends StatefulWidget {
   static String id = 'confirm_number';
-  ConfirmNumber({Key key}) : super(key: key);
+  ConfirmNumber({Key? key}) : super(key: key);
 
   @override
   State<ConfirmNumber> createState() => _ConfirmNumberState();
 }
 
 class _ConfirmNumberState extends State<ConfirmNumber> {
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController();
+
+  Future<void> handlePermissions() async {
+    await [
+      Permission.contacts,
+    ].request();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+    handlePermissions();
   }
 
   @override
   Widget build(BuildContext context) {
     final providerUserPref = Provider.of<UserSimplePreferences>(context);
-    _controller.text = providerUserPref.offlineNumber;
-    _controller.text = providerUserPref.getPhoneNumber;
+    _controller.text = providerUserPref.offlineNumber != null
+        ? providerUserPref.offlineNumber!
+        : '';
+
+    _controller.text = providerUserPref.getPhoneNumber != null
+        ? providerUserPref.getPhoneNumber!
+        : '';
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add emergency contact'),
+        title: Text(
+          'Add emergency contact',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -72,7 +89,7 @@ class _ConfirmNumberState extends State<ConfirmNumber> {
               height: 40,
             ),
             PhysicalModel(
-              color: Colors.grey[700],
+              color: Colors.grey[700]!,
               borderRadius: BorderRadius.circular(5),
               elevation: 5,
               child: InkWell(

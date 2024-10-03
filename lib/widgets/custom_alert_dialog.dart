@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class CustomAlertDialog extends StatelessWidget {
   const CustomAlertDialog({
-    Key key,
-    this.title,
-    this.content,
-    this.onPressed,
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.onPressed,
   }) : super(key: key);
 
   final String title;

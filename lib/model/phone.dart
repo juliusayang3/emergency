@@ -1,5 +1,5 @@
 class Phone {
-  String phoneNumber;
+  String? phoneNumber;
 
   Phone({
     this.phoneNumber,

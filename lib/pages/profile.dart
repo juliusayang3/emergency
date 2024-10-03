@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key key}) : super(key: key);
+  const Profile({Key? key}) : super(key: key);
   static const String id = 'profile';
 
   @override
@@ -12,13 +12,11 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  User user;
+  User? user;
 
   @override
   void initState() {
     super.initState();
-
-    
   }
 
   @override
@@ -31,12 +29,7 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         title: Text(
           'Profile',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-            wordSpacing: 2,
-            color: Colors.grey[300],
-          ),
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
       ),
@@ -65,7 +58,7 @@ class _ProfileState extends State<Profile> {
                 Container(
                   width: width * 0.45,
                   child: TextFormField(
-                    initialValue: user.firstName,
+                    initialValue: user!.firstName,
                     cursorColor: Colors.grey[700],
                     keyboardType: TextInputType.name,
                     textCapitalization: TextCapitalization.words,
@@ -80,7 +73,7 @@ class _ProfileState extends State<Profile> {
                       enabledBorder: OutlineInputBorder(),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (firstName) => user = user.copy(
+                    onChanged: (firstName) => user = user!.copy(
                       firstName: firstName,
                     ),
                   ),
@@ -88,7 +81,7 @@ class _ProfileState extends State<Profile> {
                 Container(
                   width: width * 0.45,
                   child: TextFormField(
-                    initialValue: user.lastName,
+                    initialValue: user!.lastName,
                     cursorColor: Colors.grey[700],
                     keyboardType: TextInputType.name,
                     textCapitalization: TextCapitalization.words,
@@ -103,7 +96,7 @@ class _ProfileState extends State<Profile> {
                       enabledBorder: OutlineInputBorder(),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (lastName) => user = user.copy(
+                    onChanged: (lastName) => user = user!.copy(
                       lastName: lastName,
                     ),
                   ),
@@ -120,7 +113,7 @@ class _ProfileState extends State<Profile> {
               child: InkResponse(
                 radius: 30,
                 onTap: () {
-                  providerUserPref.setUser(user);
+                  providerUserPref.setUser(user!);
                   Navigator.pop(context);
                 },
                 child: Container(
