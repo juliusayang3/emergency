@@ -4,33 +4,33 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
 class GetLocation extends ChangeNotifier {
-  Position getPosition;
-  String address;
-  String latitude;
-  String longitude;
-  String accuracy;
+  Position? getPosition;
+  String? address;
+  String? latitude;
+  String? longitude;
+  String? accuracy;
 
-  String get currentPositionLatitude {
+  String? get currentPositionLatitude {
     return latitude;
   }
 
-  String get currentPositionLongitude {
+  String? get currentPositionLongitude {
     return longitude;
   }
 
-  String get currentPositionAccuracy {
+  String? get currentPositionAccuracy {
     return accuracy;
   }
 
-  Position get currentPosition {
+  Position? get currentPosition {
     return getPosition;
   }
 
-  String get currentAddress {
+  String? get currentAddress {
     return address;
   }
 
-  Future<Position> determinePosition() async {
+  Future<Position?> determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -61,9 +61,9 @@ class GetLocation extends ChangeNotifier {
       Placemark place = placemark[0];
 
       getPosition = position;
-      latitude = getPosition.latitude.toStringAsFixed(5);
-      longitude = getPosition.longitude.toStringAsFixed(5);
-      accuracy = getPosition.latitude.toStringAsFixed(5);
+      latitude = getPosition!.latitude.toStringAsFixed(5);
+      longitude = getPosition!.longitude.toStringAsFixed(5);
+      accuracy = getPosition!.latitude.toStringAsFixed(5);
       address =
           " ${place.street}, ${place.postalCode}, ${place.locality}, ${place.country}";
     } catch (e) {
@@ -71,5 +71,6 @@ class GetLocation extends ChangeNotifier {
     }
 
     notifyListeners();
+    return null;
   }
 }
